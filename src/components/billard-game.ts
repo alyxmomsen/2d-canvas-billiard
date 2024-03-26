@@ -12,7 +12,7 @@ export default class BillardGame {
         const collision = detectCollision(subject, object, this.frame);
 
         if (collision) {
-          resolveCollision(subject, object);
+          resolveCollision(subject, object, 0.8);
         }
       }
 
@@ -75,36 +75,12 @@ function detectCollision(
   frame: { width: number; height: number },
 ): boolean {
   if (ballA.position.x + ballA.movement.velocity.x - ballA.radius <= 0) {
-    const nativeX = ballA.movement.velocity.x;
-    const nativeVelocityY = ballA.movement.velocity.y;
-
-    // let newValueX = Math.abs(nativeVelocityX) * 0.8 ;
-    // let newValueY = Math.abs(nativeVelocityY) * 0.8 ;
-
-    // newValueX * nativeVelocityX > 0 ? 1 : nativeVelocityX < 0 ? -1 : 0 ;
-    // newValueY * nativeVelocityY > 0 ? 1 : nativeVelocityY < 0 ? -1 : 0 ;
-
-    ballA.movement.velocity.x = -((Math.abs(ballA.movement.velocity.x) / 4) *
-      2 *
-      nativeX >
-    0
-      ? 1
-      : nativeX < 0
-        ? -1
-        : 0);
+    ballA.movement.velocity.x = -ballA.movement.velocity.x;
   } else if (
     ballA.position.x + ballA.movement.velocity.x + ballA.radius >=
     frame.width
   ) {
-    const nativeX = ballA.movement.velocity.x;
-    ballA.movement.velocity.x = -((Math.abs(ballA.movement.velocity.x) / 4) *
-      2 *
-      nativeX >
-    0
-      ? 1
-      : nativeX < 0
-        ? -1
-        : 0);
+    ballA.movement.velocity.x = -ballA.movement.velocity.x;
   }
 
   if (ballA.position.y + ballA.movement.velocity.y - ballA.radius <= 0) {
@@ -133,7 +109,7 @@ function detectCollision(
   return distance <= ballA.radius + ballB.radius;
 }
 
-function resolveCollision(ballA: Ball, ballB: Ball): void {
+function resolveCollision(ballA: Ball, ballB: Ball, speedLoss: number): void {
   const collisionNormal = {
     x: ballB.position.x - ballA.position.x,
     y: ballB.position.y - ballA.position.y,
@@ -168,4 +144,11 @@ function resolveCollision(ballA: Ball, ballB: Ball): void {
   ballA.movement.velocity.y -= (1 / ballA.radius) * impulse.y;
   ballB.movement.velocity.x += (1 / ballB.radius) * impulse.x;
   ballB.movement.velocity.y += (1 / ballB.radius) * impulse.y;
+
+  /* test */
+
+  ballA.movement.velocity.x *= speedLoss;
+  ballA.movement.velocity.y *= speedLoss;
+  ballB.movement.velocity.x *= speedLoss;
+  ballB.movement.velocity.y *= speedLoss;
 }
