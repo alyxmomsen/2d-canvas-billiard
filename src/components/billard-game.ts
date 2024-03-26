@@ -1,9 +1,11 @@
 import Ball, { Point } from "./ball";
+import MouseObject from "./mouse-object";
 
 export default class BillardGame {
   balls: Ball[];
   frame: { width: number; height: number };
   mouse: Point;
+  mouseObject:MouseObject ;
 
   update() {
     this.balls.forEach((subject) => {
@@ -19,11 +21,24 @@ export default class BillardGame {
 
       subject.update();
     });
+
+
+
   }
 
-  render({ ctx }: { ctx: CanvasRenderingContext2D }) {
+  render({
+    ctx,
+    canvasRef,
+  }: {
+    ctx: CanvasRenderingContext2D;
+    canvasRef: React.RefObject<HTMLCanvasElement>;
+  }) {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, 800, 600);
+
+    const canvasPosition = canvasRef.current?.getBoundingClientRect();
+
+    
 
     this.balls.forEach((ball) => {
       ctx.beginPath();
@@ -34,15 +49,21 @@ export default class BillardGame {
     });
 
     ctx.beginPath();
-    ctx.arc(this.mouse.x, this.mouse.y, 100, 0, 2 * Math.PI);
-    ctx.fillStyle = "green";
+    ctx.arc(
+      this.mouse.x - (canvasPosition !== undefined ? canvasPosition.x : 0),
+      this.mouse.y - (canvasPosition !== undefined ? canvasPosition.y : 0),
+      25,
+      0,
+      2 * Math.PI,
+    );
+    ctx.fillStyle = "purple";
     ctx.fill();
     ctx.closePath();
   }
 
   constructor() {
     this.mouse = { x: Infinity, y: Infinity };
-
+    this.mouseObject = new MouseObject({radius:50});
     window.addEventListener("mousemove", (e) => {
       this.mouse.x = e.clientX;
       this.mouse.y = e.clientY;
