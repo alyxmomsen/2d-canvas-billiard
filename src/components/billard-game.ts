@@ -4,23 +4,41 @@ import MouseObject from "./mouse-object";
 export default class BillardGame {
   balls: Ball[];
   frame: { width: number; height: number };
-  mouse: Point;
+  // mouse: Point;
   mouseObject:MouseObject ;
 
-  update() {
+  update({canvasRef}:{canvasRef:React.RefObject<HTMLCanvasElement>}) {
     this.balls.forEach((subject) => {
-      for (const object of this.balls) {
+      for (const object of [...this.balls , this.mouseObject]) {
         if (object === subject) continue;
+
+        /* if(object instanceof MouseObject) {
+
+          const canvasDelta = canvasRef.current?.getBoundingClientRect()
+  
+          object.position.x = object.position.x - ((canvasDelta !== undefined) ? canvasDelta.x : 0) ;
+          object.position.y = object.position.y - ((canvasDelta !== undefined) ? canvasDelta.y : 0) ;
+        } */
+
 
         const collision = detectCollision(subject, object, this.frame);
 
         if (collision) {
+          
           resolveCollision(subject, object, 0.91);
+          /* vv temp vv */
+          if(object instanceof Ball) {
+            /* ^^ temp ^^ */
+          }
+
         }
       }
 
       subject.update();
     });
+
+    // detectCollision(this.mouseObject , );
+
   }
 
   render({
@@ -59,11 +77,11 @@ export default class BillardGame {
   }
 
   constructor() {
-    this.mouse = { x: Infinity, y: Infinity };
+    
     this.mouseObject = new MouseObject({radius:50});
     window.addEventListener("mousemove", (e) => {
-      this.mouse.x = e.clientX;
-      this.mouse.y = e.clientY;
+
+      
 
       this.mouseObject.position.x = e.clientX ;
       this.mouseObject.position.y = e.clientY ;
@@ -107,8 +125,8 @@ function randomColor() {
 }
 
 function detectCollision(
-  ballA: Ball,
-  ballB: Ball,
+  ballA: Ball|MouseObject,
+  ballB: Ball|MouseObject,
   frame: { width: number; height: number },
 ): boolean {
   if (ballA.position.x + ballA.movement.velocity.x - ballA.radius <= 0) {
@@ -143,10 +161,15 @@ function detectCollision(
         2,
       ),
   );
+
+        if(ballB instanceof MouseObject && distance <= ballA.radius + ballB.radius) {
+          console.log('mouse collision ');
+        }
+
   return distance <= ballA.radius + ballB.radius;
 }
 
-function resolveCollision(ballA: Ball, ballB: Ball, speedLoss: number): void {
+function resolveCollision(ballA: Ball, ballB: Ball|MouseObject, speedLoss: number): void {
   const collisionNormal = {
     x: ballB.position.x - ballA.position.x,
     y: ballB.position.y - ballA.position.y,
@@ -188,4 +211,8 @@ function resolveCollision(ballA: Ball, ballB: Ball, speedLoss: number): void {
   ballA.movement.velocity.y *= speedLoss;
   ballB.movement.velocity.x *= speedLoss;
   ballB.movement.velocity.y *= speedLoss;
+
+  if(ballB instanceof MouseObject) {
+    // alert();
+  }
 }

@@ -19,7 +19,7 @@ export default function Canvas() {
         }
 
         const refrash = () => {
-          game.update();
+          game.update({canvasRef});
           game.render({ ctx, canvasRef });
 
           window.requestAnimationFrame(refrash);
