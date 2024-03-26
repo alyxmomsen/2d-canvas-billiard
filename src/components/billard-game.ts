@@ -3,8 +3,10 @@ import Ball, { Point } from "./ball";
 export default class BillardGame {
   balls: Ball[];
   frame: { width: number; height: number };
+  mouse:Point ;
+  window:Window ;
 
-  update() {
+  update({ mouseState }: { mouseState: { x: number; y: number } }) {
     this.balls.forEach((subject) => {
       for (const object of this.balls) {
         if (object === subject) continue;
@@ -12,7 +14,7 @@ export default class BillardGame {
         const collision = detectCollision(subject, object, this.frame);
 
         if (collision) {
-          resolveCollision(subject, object, 0.8);
+          resolveCollision(subject, object, 0.91);
         }
       }
 
@@ -20,7 +22,15 @@ export default class BillardGame {
     });
   }
 
-  render(ctx: CanvasRenderingContext2D) {
+  render({
+    ctx,
+    mouseState,
+  }: {
+    ctx: CanvasRenderingContext2D;
+    mouseState: { x: number; y: number };
+  }) {
+
+
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, 800, 600);
 
@@ -31,9 +41,36 @@ export default class BillardGame {
       ctx.fill();
       ctx.closePath();
     });
+
+    console.log(this.mouse.x);
+
+    ctx.beginPath();
+      ctx.arc(this.mouse.x, this.mouse.y, 100, 0, 2 * Math.PI);
+      ctx.fillStyle = 'green';
+      ctx.fill();
+      ctx.closePath();
+
+  }
+
+  updateMouse (e:MouseEvent) {
+
+    this.mouse.x = e.clientX ;
+    this.mouse.y = e.clientY ;
+
+
   }
 
   constructor() {
+
+    this.window = window ;
+    
+    this.mouse = {x:Infinity , y:Infinity}
+  
+    window.addEventListener('mousemove' , (e) => {
+      this.updateMouse(e);
+    }) ;
+
+
     this.frame = { width: 800, height: 600 };
     this.balls = [
       new Ball({
