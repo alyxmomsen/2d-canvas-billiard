@@ -10,7 +10,6 @@ export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext("2d");
 
@@ -20,11 +19,8 @@ export default function Canvas() {
         }
 
         const refrash = () => {
-
-          // console.log(mainCTX.mouseState.x);
-          
-          game.update({ mouseState: mainCTX.mouseState});
-          game.render({ ctx, mouseState: mainCTX.mouseState }); 
+          game.update();
+          game.render({ ctx });
 
           window.requestAnimationFrame(refrash);
         };
