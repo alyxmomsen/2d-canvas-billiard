@@ -1,33 +1,37 @@
-interface Point {
+import Movement from "./movement";
+
+export type Point = {
   x: number;
   y: number;
-}
+};
 
 export default class Ball {
   position: Point;
-  velocity: Point;
   radius: number;
-  color:string ;
-  
-  update () {
-    this.position.x += this.velocity.x ;
-    this.position.y += this.velocity.y ;
+  color: string;
+
+  movement: Movement;
+
+  update() {
+    this.position.x += this.movement.velocity.x;
+    this.position.y += this.movement.velocity.y;
   }
 
   constructor({
     position,
     velocity,
     radius,
-    color ,
+    color,
   }: {
     position: Point;
     velocity: Point;
     radius: number;
-    color:string ;
+    color: string;
   }) {
     this.position = { ...position };
-    this.velocity = { ...velocity };
+    // this.velocity = { ...velocity };
     this.radius = radius;
-    this.color = color ;
+    this.color = color;
+    this.movement = new Movement({ velocity });
   }
 }

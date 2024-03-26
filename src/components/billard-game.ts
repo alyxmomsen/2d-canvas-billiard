@@ -1,67 +1,134 @@
-import Ball from "./ball";
+import Ball, { Point } from "./ball";
 
 export default class BillardGame {
   balls: Ball[];
-  
+  frame: { width: number; height: number };
 
   update() {
-
     this.balls.forEach((subject) => {
-        for (const object of this.balls) {
+      for (const object of this.balls) {
+        if (object === subject) continue;
 
-            if(object === subject) continue ;
+        const collision = detectCollision(subject, object, this.frame);
 
-            const collision = detectCollision(subject , object);
-
-            if(collision) {
-                // alert();
-
-                console.log('collision');
-
-            }
-
-
+        if (collision) {
+          resolveCollision(subject, object);
         }
+      }
 
-
-        subject.update() ;
+      subject.update();
     });
-
-
-
   }
 
-  render(ctx:CanvasRenderingContext2D) {
- 
-    ctx.fillStyle = 'white' ;
-    ctx.fillRect(0 , 0 , 800 , 600) ;
+  render(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, 800, 600);
 
-      this.balls.forEach(ball => {
-          
-        ctx.beginPath();
-        ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.closePath();
+    this.balls.forEach((ball) => {
+      ctx.beginPath();
+      ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+      ctx.closePath();
     });
-
   }
 
   constructor() {
-
-    
-
+    this.frame = { width: 800, height: 600 };
     this.balls = [
-        new Ball({position:{ x: 0, y: 100 } , velocity:{ x: 1, y: 0 } , radius:50 , color:'red'}) ,
-        new Ball({position:{ x: 500, y: 100 } , velocity:{ x: -1, y: 0 } , radius:50 , color:'green'}) ,
+      new Ball({
+        position: { x: Math.random() * 700, y: Math.random() * 500 },
+        velocity: { x: Math.random() * 2, y: Math.random() * 2 },
+        radius: 50,
+        color: "red",
+      }),
     ];
+
+    for (let i = 0; i < 50; i++) {
+      this.balls.push(
+        new Ball({
+          position: { x: Math.random() * 600, y: Math.random() * 400 },
+          velocity: { x: Math.random() * 4 - 2, y: Math.random() * 4 - 2 },
+          radius: 25,
+          color: randomColor(),
+        }),
+      );
+    }
   }
 }
 
-function detectCollision(ballA: Ball, ballB: Ball): boolean {
+function randomColor() {
+  let str = "#";
+  const letters = ["a", "b", "c", "d", "e", "f"];
+  for (let i = 0; i < 6; i++) {
+    const number = Math.floor(Math.random() * 16);
+
+    str += number > 9 ? letters[number - 9] : number;
+  }
+
+  return str;
+}
+
+function detectCollision(
+  ballA: Ball,
+  ballB: Ball,
+  frame: { width: number; height: number },
+): boolean {
+  if (ballA.position.x + ballA.movement.velocity.x - ballA.radius <= 0) {
+    const nativeX = ballA.movement.velocity.x;
+    const nativeVelocityY = ballA.movement.velocity.y;
+
+    // let newValueX = Math.abs(nativeVelocityX) * 0.8 ;
+    // let newValueY = Math.abs(nativeVelocityY) * 0.8 ;
+
+    // newValueX * nativeVelocityX > 0 ? 1 : nativeVelocityX < 0 ? -1 : 0 ;
+    // newValueY * nativeVelocityY > 0 ? 1 : nativeVelocityY < 0 ? -1 : 0 ;
+
+    ballA.movement.velocity.x = -((Math.abs(ballA.movement.velocity.x) / 4) *
+      2 *
+      nativeX >
+    0
+      ? 1
+      : nativeX < 0
+        ? -1
+        : 0);
+  } else if (
+    ballA.position.x + ballA.movement.velocity.x + ballA.radius >=
+    frame.width
+  ) {
+    const nativeX = ballA.movement.velocity.x;
+    ballA.movement.velocity.x = -((Math.abs(ballA.movement.velocity.x) / 4) *
+      2 *
+      nativeX >
+    0
+      ? 1
+      : nativeX < 0
+        ? -1
+        : 0);
+  }
+
+  if (ballA.position.y + ballA.movement.velocity.y - ballA.radius <= 0) {
+    ballA.movement.velocity.y = -ballA.movement.velocity.y;
+  } else if (
+    ballA.position.y + ballA.movement.velocity.y + ballA.radius >=
+    frame.height
+  ) {
+    ballA.movement.velocity.y = -ballA.movement.velocity.y;
+  }
+
   const distance = Math.sqrt(
-    Math.pow(ballB.position.x - ballA.position.x, 2) +
-      Math.pow(ballB.position.y - ballA.position.y, 2),
+    Math.pow(
+      ballB.position.x +
+        ballB.movement.velocity.x -
+        (ballA.position.x + ballA.movement.velocity.x),
+      2,
+    ) +
+      Math.pow(
+        ballB.position.y +
+          ballB.movement.velocity.y -
+          (ballA.position.y - ballA.movement.velocity.y),
+        2,
+      ),
   );
   return distance <= ballA.radius + ballB.radius;
 }
@@ -78,8 +145,8 @@ function resolveCollision(ballA: Ball, ballB: Ball): void {
   collisionNormal.y /= magnitude;
 
   const relativeVelocity = {
-    x: ballB.velocity.x - ballA.velocity.x,
-    y: ballB.velocity.y - ballA.velocity.y,
+    x: ballB.movement.velocity.x - ballA.movement.velocity.x,
+    y: ballB.movement.velocity.y - ballA.movement.velocity.y,
   };
   const speedAlongNormal =
     relativeVelocity.x * collisionNormal.x +
@@ -97,8 +164,8 @@ function resolveCollision(ballA: Ball, ballB: Ball): void {
     y: impulseMagnitude * collisionNormal.y,
   };
 
-  ballA.velocity.x -= (1 / ballA.radius) * impulse.x;
-  ballA.velocity.y -= (1 / ballA.radius) * impulse.y;
-  ballB.velocity.x += (1 / ballB.radius) * impulse.x;
-  ballB.velocity.y += (1 / ballB.radius) * impulse.y;
+  ballA.movement.velocity.x -= (1 / ballA.radius) * impulse.x;
+  ballA.movement.velocity.y -= (1 / ballA.radius) * impulse.y;
+  ballB.movement.velocity.x += (1 / ballB.radius) * impulse.x;
+  ballB.movement.velocity.y += (1 / ballB.radius) * impulse.y;
 }
