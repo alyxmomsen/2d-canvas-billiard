@@ -21,9 +21,6 @@ export default class BillardGame {
 
       subject.update();
     });
-
-
-
   }
 
   render({
@@ -50,13 +47,13 @@ export default class BillardGame {
 
     ctx.beginPath();
     ctx.arc(
-      this.mouse.x - (canvasPosition !== undefined ? canvasPosition.x : 0),
-      this.mouse.y - (canvasPosition !== undefined ? canvasPosition.y : 0),
-      25,
-      0,
-      2 * Math.PI,
+      this.mouseObject.position.x - (canvasPosition !== undefined ? canvasPosition.x : 0),
+      this.mouseObject.position.y - (canvasPosition !== undefined ? canvasPosition.y : 0),
+      this.mouseObject.radius , 
+      0 ,
+      2 * Math.PI ,
     );
-    ctx.fillStyle = "purple";
+    ctx.fillStyle = "purple" ;
     ctx.fill();
     ctx.closePath();
   }
@@ -67,6 +64,11 @@ export default class BillardGame {
     window.addEventListener("mousemove", (e) => {
       this.mouse.x = e.clientX;
       this.mouse.y = e.clientY;
+
+      this.mouseObject.position.x = e.clientX ;
+      this.mouseObject.position.y = e.clientY ;
+
+
     });
 
     this.frame = { width: 800, height: 600 };
