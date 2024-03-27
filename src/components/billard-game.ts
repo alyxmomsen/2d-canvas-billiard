@@ -81,7 +81,7 @@ export default class BillardGame {
         new Ball({
           position: { x: Math.random() * 600, y: Math.random() * 400 },
           velocity: { x: Math.random() * 4 - 2, y: Math.random() * 4 - 2 },
-          radius: 25,
+          radius: (Math.random() * 20 + 5),
           color: randomColor(),
         }),
       );
