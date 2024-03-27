@@ -1,5 +1,5 @@
 import Ball, { Point } from "./ball";
-import { detectCollision, resolveCollision } from "./lib/my-lib";
+import { detectCollision, randomColor, resolveCollision } from "./lib/my-lib";
 import MouseObject from "./mouse-object";
 
 export default class BillardGame {
@@ -89,14 +89,4 @@ export default class BillardGame {
   }
 }
 
-function randomColor() {
-  let str = "#";
-  const letters = ["a", "b", "c", "d", "e", "f"];
-  for (let i = 0; i < 6; i++) {
-    const number = Math.floor(Math.random() * 16);
 
-    str += number > 9 ? letters[number - 9] : number;
-  }
-
-  return str;
-}

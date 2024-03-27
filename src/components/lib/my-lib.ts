@@ -97,3 +97,15 @@ export function detectCollision(
 
   return distance <= ballA.radius + ballB.radius;
 }
+
+export function randomColor() {
+    let str = "#";
+    const letters = ["a", "b", "c", "d", "e", "f"];
+    for (let i = 0; i < 6; i++) {
+      const number = Math.floor(Math.random() * 16);
+  
+      str += number > 9 ? letters[number - 9] : number;
+    }
+  
+    return str;
+  }
