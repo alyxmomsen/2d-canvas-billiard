@@ -22,7 +22,7 @@ export function resolveCollision(
   };
   const speedAlongNormal =
     relativeVelocity.x * collisionNormal.x +
-    relativeVelocity.y * collisionNormal.y;
+    relativeVelocity.y * collisionNormal.y ;
 
   if (speedAlongNormal > 0) {
     return; // Balls are moving away from each other, no collision
