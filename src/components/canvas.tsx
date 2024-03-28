@@ -18,6 +18,8 @@ export default function Canvas() {
           mainCTX.setCanvasRef(canvasRef);
         }
 
+        /// foo bar
+
         const refrash = () => {
           game.update({ canvasRef });
           game.render({ ctx, canvasRef });
