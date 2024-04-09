@@ -54,13 +54,13 @@ export default class BillardGame {
       0,
       2 * Math.PI,
     );
-    ctx.fillStyle = "purple";
+    ctx.fillStyle = "#6666";
     ctx.fill();
     ctx.closePath();
   }
 
   constructor() {
-    this.mouseObject = new MouseObject({ radius: 50 });
+    this.mouseObject = new MouseObject({ radius: 25 });
     window.addEventListener("mousemove", (e) => {
       this.mouseObject.position.x = e.clientX;
       this.mouseObject.position.y = e.clientY;
